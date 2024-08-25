@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html >
+<body>
+    <div id ="root"></div>
+</body>
+<script src="https://unpkg.com/react@17.0.2/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+    const root= document.getElementById("root");
+    function App (){
+        //let과 const의 차이는?
+        let [counter,setCounter] = React.useState(0);
+        const onClick = () => {
+            //자동 렌더링
+           // setCounter(counter +1);
+           //확실히 현재 값이라는 걸 보장함. 변수명 상관없음
+           setCounter((current)=>current+1);
+        }
+        return (
+            <div>
+                <h3>Total Clicks : {counter} </h3>
+                <button onClick={onClick}> Click Me </button>
+            </div>
+        );
+    }
+    ReactDOM.render(<App/>,root);
+</script>
+</html>
+
