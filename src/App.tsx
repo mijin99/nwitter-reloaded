@@ -6,34 +6,36 @@ import Login from "./routes/login";
 import CreateAccount from "./routes/create-account";
 import { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
+import { useEffect, useState } from "react";
+import LoadingScreen from "./components/loading-screen";
 
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element :<Layout/>,
-    children :[
-    {
-      path:"",
-      element:<Home/>,
-    },
-    {
-      path:"profile",
-      element:<Profile/>,
-    },
+    element: <Layout />,
+    children: [
+      {
+        path: "",
+        element: <Home />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
     ],
   },
   {
-    path:"/login",
-    element:<Login/>
+    path: "/login",
+    element: <Login />
   },
   {
-    path:"/create-account",
-    element:<CreateAccount/>,
+    path: "/create-account",
+    element: <CreateAccount />,
   },
 ]);
 
-const GlobalStyles=createGlobalStyle`
+const GlobalStyles = createGlobalStyle`
   ${reset};
   *{
     box-sizing : border-box;
@@ -48,12 +50,25 @@ const GlobalStyles=createGlobalStyle`
 
 function App() {
 
+  //2.2 firebase authenthication 
+  const [isLoading, setLoading] = useState(true);
+  const init = async () => {
+    //wait for firebase , 동기
+   setLoading(false);
+   //로딩 화면 테스트 페이지 2초
+   // setTimeout(()=> setLoading(false),2000);
+  }
+  useEffect(() => { 
+    init();
+  },[])
+
   return (<>
-  <GlobalStyles/>
-    <RouterProvider router={router}/>
+    <GlobalStyles />
+    {isLoading ? <LoadingScreen/> :  <RouterProvider router={router} />}
+   
   </>
   );
-      
+
 }
 
 export default App
