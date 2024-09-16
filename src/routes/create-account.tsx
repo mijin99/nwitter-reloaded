@@ -1,45 +1,17 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import React, { useState } from "react";
-import { useActionData, useNavigate } from "react-router-dom";
-import styled from "styled-components"
+import { Link, useActionData, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
+import { FirebaseError } from "firebase/app";
+import { Error, Form, Input, Switcher, Title, Wrapper } from "../components/auth-components";
+import GithubButton from "../components/github-btn";
 
-const Wrapper =styled.div`
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 420px;
-    padding: 50px 0px;
-`;
+//이런식으로 에러코드를 치환하여 사용 가능(현재는 미사용)
+//const errors = {
+//    "auth/email-already-in-use" : "That email already exists."
+//};
 
-const Title = styled.h1`
-    font-size: 42px;
-`;
 
-const Form =styled.form`
-    margin-top: 50px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-`;
-
-const Input = styled.input`
-    padding: 10px 20px;
-    border-radius: 50px;
-    border: none;
-    width: 100%;
-    font-size: 16px;
-    &[type="submit"] {
-    cursor: pointer;
-    &:hover {
-    opacity: 0.8;}}
-`;
-const Error = styled.span`
-    font-weight :600;
-    color : tomato ;
-`;
 
 export default function CreateAccount(){
     const navigate = useNavigate();
@@ -63,12 +35,13 @@ export default function CreateAccount(){
 
     const onSubmit= async(e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault ();
-        if (isLoading || name ==="" || email ==="" || password ==="") return ;
-        try{
-            setLoading (true);
+        setError("");
+        if (isLoading || name === "" || email === "" || password === "") return;
+        //사용자 계정생성 start 
+        try {
+            setLoading(true);
             //1. create an account
             const credentials =  await createUserWithEmailAndPassword(auth, email,password);
-            console.log(credentials.user);
             //2. set the name of the user profile
             await updateProfile(credentials.user,{displayName: name});
             //3. redirect to the home page
@@ -76,11 +49,14 @@ export default function CreateAccount(){
 
         } catch (e){
             //이미 계정이 있거나 비밀번호가 유효하지 않은 경우
+           if(e instanceof FirebaseError){
+            setError(e.message);
+           }
 
         } finally{
             setLoading(false);
         }
-        console.log(name,email,password);
+       // console.log(name,email,password);
     }
     return (
     <Wrapper>
@@ -91,7 +67,11 @@ export default function CreateAccount(){
             <Input onChange={onChange} name ="password" value={password} placeholder="Password" type="password" required/>
             <Input  type="submit" value= {isLoading ? "Loading...": "Create Account"}/>
         </Form>
-        {error ! == "" ? <Error>{error}</Error> : null}
+        {error !== "" ? <Error>{error}</Error> : null}
+        <Switcher>
+            Already have an account?{""} <Link to ="/login">Log in &rarr;</Link>
+        </Switcher>
+        <GithubButton/>
     </Wrapper>
     );
 }
